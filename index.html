@@ -135,6 +135,23 @@
 
         document.body.appendChild(script);
 
+        function requestFullScreen() {
+            var canvas = document.querySelector("#unity-canvas");
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.mozRequestFullScreen) { /* Firefox */
+                canvas.mozRequestFullScreen();
+            } else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) { /* IE/Edge */
+                canvas.msRequestFullscreen();
+            }
+        }
+
+        document.addEventListener("click", () => {
+            requestFullScreen();
+        });
+
     </script>
 </body>
 </html>
