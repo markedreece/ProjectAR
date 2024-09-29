@@ -66,18 +66,17 @@
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then(function (stream) {
-                        console.log('Camera access granted');
-                        // Camera stream will be active here
+                        console.log('Camera access granted.');
+                        document.getElementById('unity-canvas').srcObject = stream;
                     })
-                    .catch(function (error) {
-                        console.error('Error accessing the camera: ', error);
+                    .catch(function (err) {
+                        console.error('Camera access denied: ', err);
                     });
             } else {
-                console.error('Camera access not supported on this browser.');
+                console.error('MediaDevices API or getUserMedia not supported in this browser.');
             }
         }
 
-        // Request camera access when the page loads
         window.onload = function () {
             requestCameraAccess();
         }
