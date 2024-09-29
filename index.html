@@ -47,6 +47,8 @@
         </div>
     </div>
     <script>
+
+
         var container = document.querySelector("#unity-container");
         var canvas = document.querySelector("#unity-canvas");
         var loadingBar = document.querySelector("#unity-loading-bar");
@@ -60,6 +62,26 @@
         // Modify or remove this function to customize the visually presented
         // way that non-critical warnings and error messages are presented to the
         // user.
+        function requestCameraAccess() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        console.log('Camera access granted');
+                        // Camera stream will be active here
+                    })
+                    .catch(function (error) {
+                        console.error('Error accessing the camera: ', error);
+                    });
+            } else {
+                console.error('Camera access not supported on this browser.');
+            }
+        }
+
+        // Request camera access when the page loads
+        window.onload = function () {
+            requestCameraAccess();
+        }
+
         function unityShowBanner(msg, type) {
             function updateBannerVisibility() {
                 warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
