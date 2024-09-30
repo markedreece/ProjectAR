@@ -84,6 +84,29 @@
                 loadUnity();
             }
         });
+
+        // Function to request higher camera resolution using getUserMedia
+        function startHighResCamera() {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: 'environment' },  // Enforce the back camera on mobile
+                    width: { ideal: 1920, max: 1920 },     // Request high resolution
+                    height: { ideal: 1080, max: 1080 }     // 1920x1080 resolution
+                }
+            })
+                .then(function (stream) {
+                    const videoElement = document.querySelector('a-scene').components['arjs'].video;
+                    videoElement.srcObject = stream;  // Set AR.js video element to use the higher-quality stream
+                })
+                .catch(function (err) {
+                    console.error("Error accessing the camera: ", err);
+                });
+        }
+
+        // Call the high-res camera function on page load
+        window.onload = function () {
+            startHighResCamera();
+        };
     </script>
 </body>
 </html>
