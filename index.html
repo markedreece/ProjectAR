@@ -9,9 +9,6 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.js"></script>
 
-    <!-- Include Unity Loader -->
-    <script src="Build/UnityLoader.js"></script> <!-- This points to your Unity WebGL build -->
-
     <style>
         body, html {
             margin: 0;
@@ -24,23 +21,17 @@
             top: 0;
             left: 0;
         }
-
-        #unityContainer {
-            width: 100%;
-            height: 100%;
-            display: none;
-        }
-        /* Initially hidden */
     </style>
 </head>
 <body>
-    <!-- AR.js scene -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- AR.js scene with higher resolution and better camera settings -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;
+             video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }"
+             vr-mode-ui="enabled: false" renderer="antialias: true;">
         <a-marker id="marker" type="pattern" url="path-to-your-marker.patt">
-            <!-- Placeholder content for AR.js to track -->
             <a-box position="0 0.5 0" material="color: yellow;"></a-box>
         </a-marker>
-        <a-entity camera></a-entity>
+        <a-entity camera="fov: 90"></a-entity> <!-- Adjusting Field of View for zoom control -->
     </a-scene>
 
     <!-- Unity WebGL container -->
@@ -62,12 +53,6 @@
             if (!unityInstance) {
                 loadUnity();
             }
-        });
-
-        // You can also listen for marker lost event
-        document.querySelector("#marker").addEventListener("markerLost", () => {
-            console.log("Marker lost");
-            // Optionally, hide or pause Unity WebGL content
         });
     </script>
 </body>
