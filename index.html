@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="index.js"></script>
+    <title>Unity WebGL Integration</title>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        #unityContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Unity WebGL container -->
+    <div id="unityContainer"></div>
+
+    <script>let unityInstance = null;
+
+        // Function to initialize Unity WebGL
+        function loadUnity() {
+            if (!unityInstance) {
+                unityInstance = UnityLoader.instantiate("unityContainer", "Build/UnityProject.json", {
+                    onProgress: UnityProgress // Optional, can be used to show a loading bar
+                }); // Adjust path as needed
+            }
+        }
+
+        // Initialize Unity WebGL on page load
+        window.onload = function () {
+            loadUnity();  // Load Unity WebGL when the page loads
+        };</script>
+</body>
+</html>
