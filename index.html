@@ -47,57 +47,12 @@
         </div>
     </div>
     <script>
-
-
         var container = document.querySelector("#unity-container");
         var canvas = document.querySelector("#unity-canvas");
         var loadingBar = document.querySelector("#unity-loading-bar");
         var progressBarFull = document.querySelector("#unity-progress-bar-full");
         var fullscreenButton = document.querySelector("#unity-fullscreen-button");
         var warningBanner = document.querySelector("#unity-warning");
-
-        // Shows a temporary message banner/ribbon for a few seconds, or
-        // a permanent error message on top of the canvas if type=='error'.
-        // If type=='warning', a yellow highlight color is used.
-        // Modify or remove this function to customize the visually presented
-        // way that non-critical warnings and error messages are presented to the
-        // user.
-        function requestCameraAccess() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (stream) {
-                        console.log('Camera access granted.');
-                        // Send message to Unity to handle the stream
-                        var videoTracks = stream.getVideoTracks();
-                        SendMessage('GameManager', 'HandleCameraStream', videoTracks[0].label);
-                        setupVideoFeed(stream); // Display the stream on a <video> element
-                    })
-                    .catch(function (err) {
-                        console.error('Camera access denied: ', err);
-                    });
-            } else {
-                console.error('getUserMedia not supported in this browser.');
-            }
-        }
-
-        // Setup the video element to display the camera stream in the HTML
-        function setupVideoFeed(stream) {
-            var videoElement = document.createElement('video');
-            videoElement.srcObject = stream;
-            videoElement.autoplay = true;
-            videoElement.setAttribute('playsinline', 'playsinline'); // Necessary for iOS
-            videoElement.style.position = 'absolute';
-            videoElement.style.top = '0px';
-            videoElement.style.left = '0px';
-            videoElement.style.width = '100%';
-            videoElement.style.height = '100%';
-            document.body.appendChild(videoElement); // Add video element to the body
-        }
-
-        // Call the camera access request function once the page is loaded
-        window.onload = function () {
-            requestCameraAccess();
-        };
 
         function unityShowBanner(msg, type) {
             function updateBannerVisibility() {
@@ -171,25 +126,6 @@
                 alert(message);
             });
         };
-
-        document.body.appendChild(script);
-
-        function requestFullScreen() {
-            var canvas = document.querySelector("#unity-canvas");
-            if (canvas.requestFullscreen) {
-                canvas.requestFullscreen();
-            } else if (canvas.mozRequestFullScreen) { /* Firefox */
-                canvas.mozRequestFullScreen();
-            } else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-                canvas.webkitRequestFullscreen();
-            } else if (canvas.msRequestFullscreen) { /* IE/Edge */
-                canvas.msRequestFullscreen();
-            }
-        }
-
-        document.addEventListener("click", () => {
-            requestFullScreen();
-        });
 
     </script>
 </body>
