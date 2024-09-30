@@ -67,19 +67,37 @@
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then(function (stream) {
                         console.log('Camera access granted.');
-                        document.getElementById('unity-canvas').srcObject = stream;
+                        // Send message to Unity to handle the stream
+                        var videoTracks = stream.getVideoTracks();
+                        SendMessage('GameManager', 'HandleCameraStream', videoTracks[0].label);
+                        setupVideoFeed(stream); // Display the stream on a <video> element
                     })
                     .catch(function (err) {
                         console.error('Camera access denied: ', err);
                     });
             } else {
-                console.error('MediaDevices API or getUserMedia not supported in this browser.');
+                console.error('getUserMedia not supported in this browser.');
             }
         }
 
+        // Setup the video element to display the camera stream in the HTML
+        function setupVideoFeed(stream) {
+            var videoElement = document.createElement('video');
+            videoElement.srcObject = stream;
+            videoElement.autoplay = true;
+            videoElement.setAttribute('playsinline', 'playsinline'); // Necessary for iOS
+            videoElement.style.position = 'absolute';
+            videoElement.style.top = '0px';
+            videoElement.style.left = '0px';
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            document.body.appendChild(videoElement); // Add video element to the body
+        }
+
+        // Call the camera access request function once the page is loaded
         window.onload = function () {
             requestCameraAccess();
-        }
+        };
 
         function unityShowBanner(msg, type) {
             function updateBannerVisibility() {
