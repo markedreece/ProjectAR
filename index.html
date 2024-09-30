@@ -10,18 +10,34 @@
     <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.js"></script>
 
     <style>
+        <style >
         body, html {
             margin: 0;
             padding: 0;
             overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
-        canvas, #unityContainer {
+        a-scene {
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #unityContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
         }
     </style>
+
+
 </head>
 <body>
     <!-- AR.js scene with higher resolution and better camera settings -->
@@ -54,6 +70,21 @@
                 loadUnity();
             }
         });
+
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { exact: 'environment' }, // Enforce the back camera
+                width: { ideal: 1920 },               // Request a specific width (can adjust to 1280 for lower resolution)
+                height: { ideal: 1080 }               // Request a specific height (720 for HD)
+            }
+        })
+            .then(function (stream) {
+                const videoElement = document.querySelector('a-scene').components['arjs'].video;
+                videoElement.srcObject = stream;  // Override AR.js video source with the manually controlled stream
+            })
+            .catch(function (error) {
+                console.error("Error accessing the camera: ", error);
+            });
     </script>
 </body>
 </html>
