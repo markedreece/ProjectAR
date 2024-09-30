@@ -3,26 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR.js and Unity WebGL Integration</title>
-
-    <!-- Include A-Frame and AR.js -->
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.js"></script>
+    <title>Unity WebGL Integration</title>
 
     <style>
-        <style >
         body, html {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-
-        a-scene {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
         }
@@ -33,80 +20,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            display: none;
         }
     </style>
-
-
 </head>
 <body>
-    <!-- AR.js scene with higher resolution and better camera settings -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;
-             video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }"
-             vr-mode-ui="enabled: false" renderer="antialias: true;">
-        <a-marker id="marker" type="pattern" url="path-to-your-marker.patt">
-            <a-box position="0 0.5 0" material="color: yellow;"></a-box>
-        </a-marker>
-        <a-entity camera="fov: 90"></a-entity> <!-- Adjusting Field of View for zoom control -->
-    </a-scene>
-
     <!-- Unity WebGL container -->
     <div id="unityContainer"></div>
 
-    <script>
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-
-        // Dynamically set the pattFile URL for AR.js
-        const pattFileUrl = getQueryParam('pattFile');
-        if (pattFileUrl) {
-            document.querySelector('#marker').setAttribute('url', pattFileUrl);  // Set the .patt file URL in AR.js
-        } else {
-            console.error('No pattFile query parameter provided!');
-        }
-
-
-        let unityInstance = null;
+    <script>let unityInstance = null;
 
         // Function to initialize Unity WebGL
         function loadUnity() {
-            unityInstance = UnityLoader.instantiate("unityContainer", "Build/UnityProject.json"); // Adjust path as needed
-            document.getElementById("unityContainer").style.display = "block"; // Show Unity container
-        }
-
-        // Listen for marker detection from AR.js
-        document.querySelector("#marker").addEventListener("markerFound", () => {
-            console.log("Marker detected");
-            // Load Unity WebGL content when the marker is detected
             if (!unityInstance) {
-                loadUnity();
+                unityInstance = UnityLoader.instantiate("unityContainer", "Build/UnityProject.json", {
+                    onProgress: UnityProgress // Optional, can be used to show a loading bar
+                }); // Adjust path as needed
             }
-        });
-
-        // Function to request higher camera resolution using getUserMedia
-        function startHighResCamera() {
-            navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { exact: 'environment' },  // Enforce the back camera on mobile
-                    width: { ideal: 1920, max: 1920 },     // Request high resolution
-                    height: { ideal: 1080, max: 1080 }     // 1920x1080 resolution
-                }
-            })
-                .then(function (stream) {
-                    const videoElement = document.querySelector('a-scene').components['arjs'].video;
-                    videoElement.srcObject = stream;  // Set AR.js video element to use the higher-quality stream
-                })
-                .catch(function (err) {
-                    console.error("Error accessing the camera: ", err);
-                });
         }
 
-        // Call the high-res camera function on page load
+        // Initialize Unity WebGL on page load
         window.onload = function () {
-            startHighResCamera();
-        };
-    </script>
+            loadUnity();  // Load Unity WebGL when the page loads
+        };</script>
 </body>
 </html>
