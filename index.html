@@ -6,6 +6,29 @@
     <title>Unity WebGL Player | Project AR</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+    <script type="text/javascript">
+        // Function to get the URL query string
+        function getQueryParameter(name) {
+            var urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Pass the data from the query string to Unity
+        function sendDataToUnity() {
+            var qrData = getQueryParameter('data'); // Get the 'data' parameter from the URL
+            if (qrData) {
+                SendMessage('GameManager', 'OnQRDataReceived', qrData); // Send the data to Unity
+            } else {
+                console.log("No QR code data found.");
+            }
+        }
+
+        // Wait for the WebGL content to load, then send the QR data to Unity
+        window.onload = function () {
+            sendDataToUnity();
+        }
+    </script>
+
 </head>
 <body>
     <div id="unity-container" class="unity-desktop">
@@ -33,19 +56,52 @@
         var warningBanner = document.querySelector("#unity-warning");
 
 
-
         function requestCameraPermission() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    console.log("Camera access granted!");
-                })
-                .catch(function (err) {
-                    console.error("Camera access denied: ", err);
-                });
+            return new Promise((resolve, reject) => {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        console.log("Camera access granted!");
+                        resolve();
+                    })
+                    .catch(function(err) {
+                        console.error("Camera access denied: ", err);
+                        alert("Camera access is required to proceed.");
+                        reject(err);
+                    });
+            });
         }
 
-        // Call this function when the WebGL content is ready
-        requestCameraPermission();
+        // Function to start Unity only after camera access is granted
+        function startUnity() {
+            var canvas = document.querySelector("#unity-canvas");
+            var loadingBar = document.querySelector("#unity-loading-bar");
+            var progressBarFull = document.querySelector("#unity-progress-bar-full");
+            var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+            var unityInstance;
+
+            createUnityInstance(canvas, config, (progress) => {
+                progressBarFull.style.width = 100 * progress + "%";
+            }).then((instance) => {
+                unityInstance = instance;
+                fullscreenButton.onclick = () => {
+                    unityInstance.SetFullscreen(1);
+                };
+            }).catch((message) => {
+                alert(message);
+            });
+        }
+
+        // Start the permission request process first
+        window.onload = function() {
+            requestCameraPermission()
+                .then(() => {
+                    // After camera access is granted, start the Unity game
+                    startUnity();
+                })
+                .catch((err) => {
+                    console.log("Camera access was denied. The game cannot proceed.");
+                });
+        };
 
         function unityShowBanner(msg, type) {
             function updateBannerVisibility() {
@@ -121,16 +177,7 @@
         var script = document.createElement("script");
         script.src = loaderUrl;
         script.onload = () => {
-            createUnityInstance(canvas, config, (progress) => {
-                progressBarFull.style.width = 100 * progress + "%";
-            }).then((unityInstance) => {
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                    unityInstance.SetFullscreen(1);
-                };
-            }).catch((message) => {
-                alert(message);
-            });
+            loadingBar.style.display = "none";
         };
 
         document.body.appendChild(script);
