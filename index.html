@@ -2,36 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Unity WebGL AR.js</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR.js and Unity WebGL Integration</title>
 
-    <!-- Add A-Frame and AR.js libraries -->
+    <!-- Include A-Frame and AR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.js"></script>
+
+    <!-- Include Unity Loader -->
+    <script src="Build/UnityLoader.js"></script> <!-- This points to your Unity WebGL build -->
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas, #unityContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #unityContainer {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        /* Initially hidden */
+    </style>
 </head>
 <body>
-    <!-- AR.js Scene -->
-    <a-scene embedded arjs="sourceType: webcam;">
-        <!-- Marker for image tracking -->
-        <a-marker type="pattern" url="card1.patt">
-            <!-- Add content to display when marker is detected -->
-            <a-entity gltf-model="path-to-your-3d-model.glb" scale="1 1 1" position="0 0 0"></a-entity>
+    <!-- AR.js scene -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <a-marker id="marker" type="pattern" url="path-to-your-marker.patt">
+            <!-- Placeholder content for AR.js to track -->
+            <a-box position="0 0.5 0" material="color: yellow;"></a-box>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Unity WebGL Content -->
-    <div class="webgl-content">
-        <div id="unityContainer" style="width: 960px; height: 600px"></div>
-        <script src="Build/UnityLoader.js"></script>
-        <script>
-            var gameInstance = UnityLoader.instantiate("unityContainer", "Build/your-webgl-build.json");
-        </script>
-    </div>
+    <!-- Unity WebGL container -->
+    <div id="unityContainer"></div>
+
+    <script>
+        let unityInstance = null;
+
+        // Function to initialize Unity WebGL
+        function loadUnity() {
+            unityInstance = UnityLoader.instantiate("unityContainer", "Build/UnityProject.json"); // Adjust path as needed
+            document.getElementById("unityContainer").style.display = "block"; // Show Unity container
+        }
+
+        // Listen for marker detection from AR.js
+        document.querySelector("#marker").addEventListener("markerFound", () => {
+            console.log("Marker detected");
+            // Load Unity WebGL content when the marker is detected
+            if (!unityInstance) {
+                loadUnity();
+            }
+        });
+
+        // You can also listen for marker lost event
+        document.querySelector("#marker").addEventListener("markerLost", () => {
+            console.log("Marker lost");
+            // Optionally, hide or pause Unity WebGL content
+        });
+    </script>
 </body>
 </html>

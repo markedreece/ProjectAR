@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR.js Tracking</title>
+
+    <!-- Include A-Frame and AR.js -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.js"></script>
+</head>
+<body>
+    <a-scene embedded arjs="sourceType: webcam;">
+        <!-- AR.js Marker; the pattern URL will be dynamically set based on the query parameter -->
+        <a-marker id="dynamicMarker" type="pattern" url="">
+            <!-- Add AR content here -->
+            <a-box position="0 0.5 0" material="color: yellow;"></a-box>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Set the marker's URL to the passed pattFile URL
+        const pattFileUrl = getQueryParam('pattFile');
+        if (pattFileUrl) {
+            document.getElementById('dynamicMarker').setAttribute('url', pattFileUrl);
+        } else {
+            console.error('No pattFile query parameter provided!');
+        }
+    </script>
+</body>
+</html>
