@@ -47,13 +47,27 @@
         <a-marker id="marker" type="pattern" url="path-to-your-marker.patt">
             <a-box position="0 0.5 0" material="color: yellow;"></a-box>
         </a-marker>
-        <a-entity camera="fov: 120"></a-entity> <!-- Adjusting Field of View for zoom control -->
+        <a-entity camera="fov: 90"></a-entity> <!-- Adjusting Field of View for zoom control -->
     </a-scene>
 
     <!-- Unity WebGL container -->
     <div id="unityContainer"></div>
 
     <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Dynamically set the pattFile URL for AR.js
+        const pattFileUrl = getQueryParam('pattFile');
+        if (pattFileUrl) {
+            document.querySelector('#marker').setAttribute('url', pattFileUrl);  // Set the .patt file URL in AR.js
+        } else {
+            console.error('No pattFile query parameter provided!');
+        }
+
+
         let unityInstance = null;
 
         // Function to initialize Unity WebGL
