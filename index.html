@@ -29,6 +29,7 @@
         }
     </script>
 
+
 </head>
 <body>
     <div id="unity-container" class="unity-desktop">
@@ -57,19 +58,25 @@
 
 
         function requestCameraPermission() {
-            return new Promise((resolve, reject) => {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        console.log("Camera access granted!");
-                        resolve();
-                    })
-                    .catch(function(err) {
-                        console.error("Camera access denied: ", err);
-                        alert("Camera access is required to proceed.");
-                        reject(err);
-                    });
-            });
+            // Request camera permission
+            return navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    console.log("Camera access granted!");
+                    // Send a message to Unity to notify the app that the camera is ready
+                    SendMessage('GameManager', 'OnCameraPermissionGranted');
+                })
+                .catch(function (err) {
+                    console.error("Camera access denied: ", err);
+                    // Send a message to Unity that the camera access was denied
+                    SendMessage('GameManager', 'OnCameraPermissionDenied');
+                    alert("Camera access is required to use this feature.");
+                });
         }
+
+        // Call this function once the page loads to request permission
+        window.onload = function () {
+            requestCameraPermission();
+        };
 
         // Function to start Unity only after camera access is granted
         function startUnity() {
